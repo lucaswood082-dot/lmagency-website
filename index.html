@@ -103,14 +103,13 @@
 
         <!-- Card 1: Short-form video / Reels -->
         <article class="service-card">
-          <!-- ============================================================
-               PLACEHOLDER MEDIA — replace this div with a real <video> or
-               <img> element once client footage is available, e.g.:
-               <video src="assets/video/reel-example-1.mp4" autoplay muted loop playsinline></video>
-               ============================================================ -->
-          <div class="media-placeholder media-9x16">
-            <svg viewBox="0 0 24 24" class="ph-icon" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
-            <span>Placeholder — Reel Example</span>
+          <!-- Real example clip. Click-to-play (see js/main.js) so it never
+               autoplays loudly on load. Swap the src to update the example. -->
+          <div class="video-player media-9x16" data-video-player>
+            <video src="assets/video/reel-example.mp4" playsinline preload="metadata"></video>
+            <button class="play-btn" type="button" aria-label="Play example reel">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+            </button>
           </div>
           <h3>Short-Form Video / Reels</h3>
           <p>Fast-paced, trend-aware reels built for Instagram and TikTok — the format
@@ -119,10 +118,8 @@
 
         <!-- Card 2: Photo posts -->
         <article class="service-card">
-          <!-- PLACEHOLDER MEDIA — replace with a real <img src="assets/images/photo-example-1.jpg" alt="..."> -->
-          <div class="media-placeholder media-1x1">
-            <svg viewBox="0 0 24 24" class="ph-icon" aria-hidden="true"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-            <span>Placeholder — Photo Post</span>
+          <div class="media-frame media-1x1">
+            <img src="assets/images/photo-post.jpg" alt="Example branded photo post" loading="lazy">
           </div>
           <h3>Photo Posts</h3>
           <p>Clean, on-brand photography and graphic posts that keep your feed
@@ -131,10 +128,23 @@
 
         <!-- Card 3: Slideshow / Carousel posts -->
         <article class="service-card">
-          <!-- PLACEHOLDER MEDIA — replace with a real <img> (or small looping gallery) of carousel slides -->
-          <div class="media-placeholder media-4x5">
-            <svg viewBox="0 0 24 24" class="ph-icon" aria-hidden="true"><path d="M4 7h13v13H4zM7 4h13v13"/></svg>
-            <span>Placeholder — Carousel Slide</span>
+          <!-- Swipeable on mobile, arrow-navigable on desktop (see js/main.js).
+               Add or remove <div class="carousel-slide"> entries to change slide count. -->
+          <div class="carousel media-4x5" data-carousel>
+            <div class="carousel-track" data-carousel-track>
+              <div class="carousel-slide"><img src="assets/images/carousel-1.jpg" alt="Carousel example, slide 1" loading="lazy"></div>
+              <div class="carousel-slide"><img src="assets/images/carousel-2.jpg" alt="Carousel example, slide 2" loading="lazy"></div>
+              <div class="carousel-slide"><img src="assets/images/carousel-3.jpg" alt="Carousel example, slide 3" loading="lazy"></div>
+              <div class="carousel-slide"><img src="assets/images/carousel-4.jpg" alt="Carousel example, slide 4" loading="lazy"></div>
+              <div class="carousel-slide"><img src="assets/images/carousel-5.jpg" alt="Carousel example, slide 5" loading="lazy"></div>
+            </div>
+            <button class="carousel-arrow carousel-prev" type="button" data-carousel-prev aria-label="Previous slide">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <button class="carousel-arrow carousel-next" type="button" data-carousel-next aria-label="Next slide">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+            <div class="carousel-dots" data-carousel-dots></div>
           </div>
           <h3>Slideshow / Carousel Posts</h3>
           <p>Swipeable, education-first carousels that build authority and hold
