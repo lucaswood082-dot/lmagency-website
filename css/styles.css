@@ -164,6 +164,7 @@ section { padding-block: clamp(64px, 10vw, 120px); }
 
 .header-actions { display: flex; align-items: center; gap: 16px; }
 .header-actions .btn-primary { display: none; }
+.header-actions .header-login-link { display: none; }
 
 .nav-toggle {
   display: flex;
@@ -588,6 +589,7 @@ section { padding-block: clamp(64px, 10vw, 120px); }
 @media (min-width: 960px) {
   .main-nav { display: block; }
   .header-actions .btn-primary { display: inline-flex; }
+  .header-actions .header-login-link { display: inline-flex; }
   .nav-toggle { display: none; }
   .mobile-menu { display: none; }
 
