@@ -55,6 +55,7 @@ async function refreshAll() {
 // Applications
 // =============================================================
 let clientsByApplicationId = {};
+let clientsByEmail = {};
 
 async function loadApplications() {
   const { data, error } = await supabase
@@ -86,22 +87,36 @@ async function loadApplications() {
   applicationsList.querySelectorAll('[data-invite]').forEach((btn) => {
     btn.addEventListener('click', () => inviteClient(btn.dataset.invite, btn));
   });
+  applicationsList.querySelectorAll('[data-resend-invite]').forEach((btn) => {
+    btn.addEventListener('click', () => resendInvite(btn.dataset.resendInvite, btn));
+  });
+  applicationsList.querySelectorAll('[data-delete-application]').forEach((btn) => {
+    btn.addEventListener('click', () => deleteApplication(btn.dataset.deleteApplication));
+  });
 }
 
 function renderApplicationCard(app) {
-  const alreadyInvited = !!clientsByApplicationId[app.id];
+  const linkedClient = clientsByApplicationId[app.id];
+  const duplicateClient = !linkedClient && clientsByEmail[app.contact_email];
   const badgeClass = `badge-${app.status}`;
 
-  let actions = '';
+  let statusAction = '';
   if (app.status === 'pending') {
-    actions = `
+    statusAction = `
       <button class="btn-tiny is-primary" data-accept="${app.id}">Accept</button>
       <button class="btn-tiny is-danger" data-decline="${app.id}">Decline</button>
     `;
   } else if (app.status === 'accepted') {
-    actions = alreadyInvited
-      ? `<span class="badge badge-active">Invited</span>`
-      : `<button class="btn-tiny is-primary" data-invite="${app.id}">Invite client</button>`;
+    if (linkedClient) {
+      statusAction = `
+        <span class="badge badge-active">Invited</span>
+        <button class="btn-tiny" data-resend-invite="${linkedClient.id}">Resend invite</button>
+      `;
+    } else if (duplicateClient) {
+      statusAction = `<span class="badge badge-active">Already a client (via another application)</span>`;
+    } else {
+      statusAction = `<button class="btn-tiny is-primary" data-invite="${app.id}">Invite client</button>`;
+    }
   }
 
   return `
@@ -119,10 +134,29 @@ function renderApplicationCard(app) {
       ${app.content_types_interested && app.content_types_interested.length ? `<p class="record-body"><strong>Interested in:</strong> ${escapeHtml(app.content_types_interested.join(', '))}</p>` : ''}
       ${app.goals ? `<p class="record-body"><strong>Goals:</strong> ${escapeHtml(app.goals)}</p>` : ''}
       ${app.message ? `<p class="record-body"><strong>Message:</strong> ${escapeHtml(app.message)}</p>` : ''}
-      <div class="record-actions">${actions}</div>
+      <div class="record-actions">
+        ${statusAction}
+        ${!linkedClient ? `<button class="btn-tiny is-danger" data-delete-application="${app.id}">Delete</button>` : ''}
+      </div>
       <p class="notice" id="app-notice-${app.id}"></p>
     </div>
   `;
+}
+
+async function deleteApplication(id) {
+  if (!confirm('Delete this application? This cannot be undone.')) return;
+
+  const { error } = await supabase.from('applications').delete().eq('id', id);
+  if (error) {
+    console.error(error);
+    const notice = document.getElementById(`app-notice-${id}`);
+    if (notice) {
+      notice.textContent = 'Could not delete.';
+      notice.classList.add('notice-error');
+    }
+    return;
+  }
+  await loadApplications();
 }
 
 async function updateApplicationStatus(id, status) {
@@ -202,8 +236,13 @@ async function loadClientsAndSubmissions() {
   }
 
   clientsByApplicationId = {};
+  clientsByEmail = {};
   (clients || []).forEach((c) => {
-    if (c.application_id) clientsByApplicationId[c.application_id] = c;
+    if (c.application_id) {
+      clientsByApplicationId[c.application_id] = c;
+      const email = contactEmailByApplicationId[c.application_id];
+      if (email) clientsByEmail[email] = c;
+    }
   });
 
   clientsCount.textContent = `${clients.length} total`;

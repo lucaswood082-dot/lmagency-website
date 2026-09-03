@@ -47,6 +47,6 @@ form.addEventListener('submit', async (event) => {
   }
 
   form.reset();
-  document.getElementById('apply-fields').hidden = true;
-  setNotice("Thanks — we've received your application and will be in touch within a couple of business days.", 'success');
+  form.hidden = true;
+  document.getElementById('apply-success').hidden = false;
 });
