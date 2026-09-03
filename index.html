@@ -284,7 +284,24 @@
             <input type="text" id="instagram_handle" name="instagram_handle" placeholder="@yourbrand" autocomplete="off">
           </div>
           <div class="form-row">
-            <label for="message">What are you looking to grow? <span class="optional">(optional)</span></label>
+            <label for="desired_weekly_posts">How many posts per week are you thinking? <span class="optional">(optional)</span></label>
+            <input type="number" id="desired_weekly_posts" name="desired_weekly_posts" min="0" step="1" inputmode="numeric">
+          </div>
+          <fieldset class="form-row">
+            <legend>What type of content are you interested in? <span class="optional">(select all that apply)</span></legend>
+            <div class="checkbox-group">
+              <label class="checkbox-option"><input type="checkbox" name="content_types_interested" value="Transformation"> Transformation</label>
+              <label class="checkbox-option"><input type="checkbox" name="content_types_interested" value="Educational"> Educational</label>
+              <label class="checkbox-option"><input type="checkbox" name="content_types_interested" value="Promo"> Promo</label>
+              <label class="checkbox-option"><input type="checkbox" name="content_types_interested" value="Community"> Community</label>
+            </div>
+          </fieldset>
+          <div class="form-row">
+            <label for="goals">What are you hoping to get out of this? <span class="optional">(optional)</span></label>
+            <textarea id="goals" name="goals" rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <label for="message">Anything else we should know? <span class="optional">(optional)</span></label>
             <textarea id="message" name="message" rows="3"></textarea>
           </div>
           <button type="submit" class="btn btn-primary btn-block" id="contact-form-submit">Book My Free Trial</button>
