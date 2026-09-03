@@ -89,7 +89,7 @@ module.exports = async (req, res) => {
   // 3. Create the Auth user + send the invite email.
   const { data: inviteData, error: inviteError } = await admin.auth.admin.inviteUserByEmail(
     application.contact_email,
-    { redirectTo: 'https://lmagency.work/login.html' },
+    { redirectTo: 'https://www.lmagency.work/login' },
   );
 
   if (inviteError || !inviteData?.user) {

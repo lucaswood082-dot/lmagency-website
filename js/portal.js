@@ -35,7 +35,7 @@ function passwordPromptKey(userId) {
 async function init() {
   const user = await getCurrentUser();
   if (!user) {
-    window.location.href = '/login.html';
+    window.location.href = '/login';
     return;
   }
 

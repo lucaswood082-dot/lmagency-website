@@ -86,7 +86,7 @@ magicLinkBtn.addEventListener('click', async () => {
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: `${window.location.origin}/login.html` },
+    options: { emailRedirectTo: `${window.location.origin}/login` },
   });
 
   magicLinkBtn.disabled = false;

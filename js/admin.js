@@ -29,13 +29,13 @@ function formatDate(value) {
 async function init() {
   const user = await getCurrentUser();
   if (!user) {
-    window.location.href = '/login.html';
+    window.location.href = '/login';
     return;
   }
 
   const admin = await isAgencyAdmin(user.id);
   if (!admin) {
-    window.location.href = '/portal.html';
+    window.location.href = '/portal';
     return;
   }
 

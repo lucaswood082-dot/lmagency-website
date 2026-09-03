@@ -35,10 +35,10 @@ export async function routeAfterLogin() {
   const user = await getCurrentUser();
   if (!user) return;
   const admin = await isAgencyAdmin(user.id);
-  window.location.href = admin ? '/admin.html' : '/portal.html';
+  window.location.href = admin ? '/admin' : '/portal';
 }
 
 export async function signOut() {
   await supabase.auth.signOut();
-  window.location.href = '/login.html';
+  window.location.href = '/login';
 }
