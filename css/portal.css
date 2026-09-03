@@ -73,7 +73,6 @@
    Forms (light surface, for use outside the dark .contact-form)
    ------------------------------------------------------------- */
 .field-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
-.field-row:last-of-type { margin-bottom: 0; }
 .field-row label { font-size: 0.85rem; font-weight: 500; }
 .field-row .hint { font-size: 0.8rem; color: var(--color-ink-soft); font-weight: 400; }
 .field-row input,
