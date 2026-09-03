@@ -17,7 +17,7 @@ A single-page, static site. No build step, no framework — open `index.html` in
 - **Testimonials** — in the "Testimonials" section, edit the quote text, name, and business name for each `<blockquote class="testimonial-card">`. Leave the surrounding HTML tags as they are.
 - **Contact form submissions** — this form is live: submissions save to the `applications` table in Supabase (see `js/apply-inline.js`) and trigger an automatic confirmation email. Review, accept/decline, and invite applicants from `/admin`.
 - **Colors/fonts** — at the top of `css/styles.css`, the `:root { ... }` block lists every color and font used site-wide. Changing a value there updates it everywhere.
-- **Logo/favicon** — the site currently uses the text "LMagency" as the logo. To use an image logo or a browser tab icon, add the file to `assets/images/` and update the commented-out favicon line in the `<head>` of `index.html`.
+- **Logo/favicon** — the site uses the text "LMagency" as the logo (no image logo yet). The browser tab icon set (`favicon.ico`, sized PNGs, `apple-touch-icon.png`, Android/PWA icons, `site.webmanifest`) lives at the project root and is linked from every page's `<head>`; swap those files in place to update it.
 
 ## Deploying
 
