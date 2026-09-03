@@ -59,7 +59,7 @@ let clientsByApplicationId = {};
 async function loadApplications() {
   const { data, error } = await supabase
     .from('applications')
-    .select('id, business_name, contact_email, instagram_handle, message, status, created_at')
+    .select('id, business_name, contact_email, instagram_handle, message, status, created_at, desired_weekly_posts, content_types_interested, goals')
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -115,7 +115,10 @@ function renderApplicationCard(app) {
         ${app.instagram_handle ? ` · ${escapeHtml(app.instagram_handle)}` : ''}
         · ${formatDate(app.created_at)}
       </div>
-      ${app.message ? `<p class="record-body">${escapeHtml(app.message)}</p>` : ''}
+      ${app.desired_weekly_posts != null ? `<p class="record-body"><strong>Posts/week wanted:</strong> ${escapeHtml(String(app.desired_weekly_posts))}</p>` : ''}
+      ${app.content_types_interested && app.content_types_interested.length ? `<p class="record-body"><strong>Interested in:</strong> ${escapeHtml(app.content_types_interested.join(', '))}</p>` : ''}
+      ${app.goals ? `<p class="record-body"><strong>Goals:</strong> ${escapeHtml(app.goals)}</p>` : ''}
+      ${app.message ? `<p class="record-body"><strong>Message:</strong> ${escapeHtml(app.message)}</p>` : ''}
       <div class="record-actions">${actions}</div>
       <p class="notice" id="app-notice-${app.id}"></p>
     </div>
