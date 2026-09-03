@@ -113,6 +113,7 @@
   text-underline-offset: 4px;
   font-size: 0.9rem;
   cursor: pointer;
+  transition: color 0.15s ease;
 }
 .link-btn:hover { color: var(--color-ink); }
 
@@ -120,8 +121,10 @@
   background: transparent;
   color: var(--color-ink);
   border: 1px solid var(--color-ink);
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
 }
-.btn-outline:hover { background: var(--color-ink); color: var(--color-bg); }
+.btn-outline:hover { background: var(--color-ink); color: var(--color-bg); transform: translateY(-1px); }
+.btn-outline:active { transform: translateY(0); }
 
 /* -------------------------------------------------------------
    Status / notice messages
@@ -205,15 +208,16 @@
   background: transparent;
   color: var(--color-ink);
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
-.btn-tiny:hover { background: var(--color-ink); color: var(--color-bg); }
+.btn-tiny:hover { background: var(--color-ink); color: var(--color-bg); transform: translateY(-1px); }
+.btn-tiny:active { transform: translateY(0); }
 .btn-tiny.is-primary { background: var(--color-ink); color: var(--color-bg); }
 .btn-tiny.is-primary:hover { background: var(--color-accent); color: var(--color-accent-ink); border-color: var(--color-accent); }
 .btn-tiny.is-danger { border-color: #8A2E20; color: #8A2E20; }
 .btn-tiny.is-danger:hover { background: #8A2E20; color: #F5F3EE; }
 .btn-tiny:disabled { opacity: 0.5; cursor: not-allowed; }
-.btn-tiny:disabled:hover { background: transparent; color: var(--color-ink); }
+.btn-tiny:disabled:hover { background: transparent; color: var(--color-ink); transform: none; }
 
 .inline-edit-row {
   display: flex;

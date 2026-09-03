@@ -78,14 +78,17 @@ h1, h2, h3 {
   border-radius: var(--radius);
   font-weight: 600;
   font-size: 0.95rem;
-  transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
   white-space: nowrap;
 }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
 .btn-primary {
   background: var(--color-ink);
   color: var(--color-bg);
 }
-.btn-primary:hover { background: var(--color-accent); color: var(--color-accent-ink); }
+.btn-primary:hover { background: var(--color-accent); color: var(--color-accent-ink); box-shadow: 0 4px 14px rgba(214, 255, 63, 0.35); }
 .btn-ghost {
   background: transparent;
   color: var(--color-ink);
@@ -94,7 +97,7 @@ h1, h2, h3 {
   text-underline-offset: 4px;
   text-decoration-color: var(--color-line);
 }
-.btn-ghost:hover { text-decoration-color: var(--color-ink); }
+.btn-ghost:hover { text-decoration-color: var(--color-ink); transform: none; }
 .btn-small { padding: 10px 20px; font-size: 0.85rem; }
 .btn-block { width: 100%; }
 
@@ -316,8 +319,10 @@ section { padding-block: clamp(64px, 10vw, 120px); }
   height: 56px;
   fill: #fff;
   filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.35));
+  transition: transform 0.15s ease;
 }
 .play-btn:hover { background: rgba(20, 20, 15, 0.28); }
+.play-btn:hover svg { transform: scale(1.08); }
 .video-player.is-playing .play-btn {
   opacity: 0;
   pointer-events: none;
@@ -364,8 +369,9 @@ section { padding-block: clamp(64px, 10vw, 120px); }
   background: rgba(245, 243, 238, 0.9);
   color: var(--color-ink);
   opacity: 0;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
 }
+.carousel-arrow:hover { transform: translateY(-50%) scale(1.08); }
 .carousel-arrow svg {
   width: 18px;
   height: 18px;
@@ -400,6 +406,7 @@ section { padding-block: clamp(64px, 10vw, 120px); }
   background: rgba(245, 243, 238, 0.55);
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
+.carousel-dot:hover:not(.is-active) { background: rgba(245, 243, 238, 0.8); transform: scale(1.15); }
 .carousel-dot.is-active {
   background: var(--color-bg);
   transform: scale(1.3);
