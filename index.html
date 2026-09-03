@@ -264,34 +264,31 @@
       </div>
 
       <!-- ============================================================
-           CONTACT FORM — currently front-end only (see js/main.js).
-           To actually receive submissions, wire the form's "action"
-           to a real endpoint (e.g. Formspree, Netlify Forms, or your
-           own backend) and remove/adjust the preventDefault() handler
-           in js/main.js.
+           CONTACT FORM — this is the same application form as /apply,
+           submitting straight to the applications table (see
+           js/apply-inline.js). Keep the same HTML structure so
+           styling and the JS field lookups don't break.
            ============================================================ -->
-      <form class="contact-form" id="contact-form" action="#" method="POST">
-        <div class="form-row">
-          <label for="name">Name</label>
-          <input type="text" id="name" name="name" required autocomplete="name">
+      <form class="contact-form" id="contact-form" novalidate>
+        <div id="contact-form-fields">
+          <div class="form-row">
+            <label for="business_name">Business name</label>
+            <input type="text" id="business_name" name="business_name" required autocomplete="organization">
+          </div>
+          <div class="form-row">
+            <label for="contact_email">Email</label>
+            <input type="email" id="contact_email" name="contact_email" required autocomplete="email">
+          </div>
+          <div class="form-row">
+            <label for="instagram_handle">Instagram handle <span class="optional">(optional)</span></label>
+            <input type="text" id="instagram_handle" name="instagram_handle" placeholder="@yourbrand" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <label for="message">What are you looking to grow? <span class="optional">(optional)</span></label>
+            <textarea id="message" name="message" rows="3"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="contact-form-submit">Book My Free Trial</button>
         </div>
-        <div class="form-row">
-          <label for="business">Business name</label>
-          <input type="text" id="business" name="business" required autocomplete="organization">
-        </div>
-        <div class="form-row">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required autocomplete="email">
-        </div>
-        <div class="form-row">
-          <label for="phone">Phone <span class="optional">(optional)</span></label>
-          <input type="tel" id="phone" name="phone" autocomplete="tel">
-        </div>
-        <div class="form-row">
-          <label for="message">What are you looking to grow? <span class="optional">(optional)</span></label>
-          <textarea id="message" name="message" rows="3"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">Book My Free Trial</button>
         <p class="form-status" id="form-status" role="status" aria-live="polite"></p>
       </form>
     </div>
@@ -329,5 +326,6 @@
 </footer>
 
 <script src="js/main.js"></script>
+<script type="module" src="js/apply-inline.js"></script>
 </body>
 </html>

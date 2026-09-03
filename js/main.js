@@ -60,34 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (yearEl) yearEl.textContent = new Date().getFullYear();
 
   /* ---------------------------------------------------------
-     Contact form
-     -----------------------------------------------------------
-     NOTE: There is no backend wired up yet. This just validates
-     the form in the browser and shows a confirmation message.
-
-     To actually receive leads, either:
-       1) Point the <form action="..."> at a service like Formspree
-          or Netlify Forms and delete this preventDefault() block, or
-       2) Replace the fetch() call below with a real request to your
-          own backend endpoint.
+     Contact form submission lives in js/apply-inline.js (loaded as a
+     module below) since it talks to Supabase.
      --------------------------------------------------------- */
-  const form = document.getElementById('contact-form');
-  const status = document.getElementById('form-status');
-
-  if (form) {
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
-
-      // Placeholder "success" state — replace with a real submission.
-      status.textContent = "Thanks — we'll be in touch within one business day.";
-      form.reset();
-    });
-  }
 
   /* ---------------------------------------------------------
      Click-to-play video (services — reel example)
