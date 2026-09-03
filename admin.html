@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agency Dashboard — LMagency</title>
+<meta name="robots" content="noindex">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="container app-header-inner">
+    <a href="/" class="logo">LMagency</a>
+    <div class="header-right">
+      <span class="page-label">Agency dashboard</span>
+      <button type="button" class="link-btn" id="sign-out-btn">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+  <div class="app-shell-wide" id="loading-shell">
+    <p class="loading-text">Loading dashboard…</p>
+  </div>
+
+  <div class="app-shell-wide" id="dashboard-content" hidden>
+
+    <section class="dash-section" id="applications-section">
+      <div class="dash-section-head">
+        <h2>Applications</h2>
+        <span class="count" id="applications-count"></span>
+      </div>
+      <div class="record-list" id="applications-list"></div>
+    </section>
+
+    <section class="dash-section" id="clients-section">
+      <div class="dash-section-head">
+        <h2>Clients</h2>
+        <span class="count" id="clients-count"></span>
+      </div>
+      <div class="record-list" id="clients-list"></div>
+    </section>
+
+    <section class="dash-section" id="submissions-section">
+      <div class="dash-section-head">
+        <h2>Submissions</h2>
+        <span class="count" id="submissions-count"></span>
+      </div>
+      <div id="submissions-groups"></div>
+    </section>
+
+  </div>
+</main>
+
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>

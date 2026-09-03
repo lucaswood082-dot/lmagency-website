@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Client Portal — LMagency</title>
+<meta name="robots" content="noindex">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="container app-header-inner">
+    <a href="/" class="logo">LMagency</a>
+    <div class="header-right">
+      <span class="page-label" id="client-label">Client portal</span>
+      <button type="button" class="link-btn" id="sign-out-btn">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+  <div class="app-shell" id="loading-shell">
+    <p class="loading-text">Loading your portal…</p>
+  </div>
+
+  <div class="app-shell" id="portal-content" hidden>
+
+    <!-- Optional, dismissible: set a password so magic links aren't the only way in -->
+    <div class="panel password-prompt" id="password-panel" hidden>
+      <p class="panel-title">Set a password <span class="hint">(optional)</span></p>
+      <p class="panel-sub">You logged in with an emailed link. Set a password now if you'd rather log in
+        that way next time — the login link will always work as a fallback either way.</p>
+      <form id="password-form" novalidate>
+        <div class="field-grid field-grid-2">
+          <div class="field-row">
+            <label for="new_password">New password</label>
+            <input type="password" id="new_password" name="new_password" minlength="8" autocomplete="new-password">
+          </div>
+          <div class="field-row">
+            <label for="confirm_password">Confirm password</label>
+            <input type="password" id="confirm_password" name="confirm_password" minlength="8" autocomplete="new-password">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-tiny is-primary">Set password</button>
+          <button type="button" class="link-btn" id="dismiss-password-btn">Maybe later</button>
+        </div>
+        <p class="notice" id="password-notice" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="app-heading">
+      <p class="eyebrow" id="portal-eyebrow">Content submission</p>
+      <h1 id="portal-heading">Request your next post.</h1>
+    </div>
+
+    <!-- Shown when subscription_status isn't active or current_period_end has passed -->
+    <div class="gate-message" id="expired-gate" hidden>
+      <h2>Your access has expired</h2>
+      <p>Please get in touch so we can renew your plan and reopen the submission form.</p>
+    </div>
+
+    <div id="active-area" hidden>
+      <form class="panel" id="submission-form" novalidate>
+        <div class="field-row">
+          <label for="content_type">Content type</label>
+          <select id="content_type" name="content_type" required>
+            <option value="" disabled selected>Choose a type…</option>
+            <option value="Transformation">Transformation</option>
+            <option value="Educational">Educational</option>
+            <option value="Promo">Promo</option>
+            <option value="Community">Community</option>
+          </select>
+        </div>
+        <div class="field-grid field-grid-2">
+          <div class="field-row">
+            <label for="requested_date">Requested date</label>
+            <input type="date" id="requested_date" name="requested_date">
+          </div>
+          <div class="field-row">
+            <label for="requested_time">Requested time</label>
+            <input type="time" id="requested_time" name="requested_time">
+          </div>
+        </div>
+        <div class="field-row">
+          <label for="notes">Notes <span class="hint">(optional)</span></label>
+          <textarea id="notes" name="notes" rows="4" placeholder="Anything specific for this post…"></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="submission-submit">Submit request</button>
+        </div>
+        <p class="notice" id="submission-notice" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="panel" style="margin-top: 40px;">
+        <p class="panel-title">Your recent requests</p>
+        <p class="panel-sub">Newest first.</p>
+        <div id="submissions-list" class="record-list">
+          <p class="loading-text">Loading…</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script type="module" src="js/portal.js"></script>
+</body>
+</html>

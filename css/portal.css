@@ -1,0 +1,275 @@
+/* =============================================================
+   LMagency — client portal / admin dashboard styles
+   Extends the variables and components defined in styles.css.
+   Load styles.css first, then this file.
+   ============================================================= */
+
+/* -------------------------------------------------------------
+   Shared app chrome (apply / login / portal / admin)
+   ------------------------------------------------------------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(245, 243, 238, 0.9);
+  backdrop-filter: saturate(180%) blur(10px);
+  border-bottom: 1px solid var(--color-line);
+}
+.app-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 76px;
+}
+.app-header .page-label {
+  font-size: 0.8rem;
+  color: var(--color-ink-soft);
+  font-weight: 500;
+}
+.app-header .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-main {
+  min-height: calc(100vh - 76px);
+  padding-block: clamp(48px, 8vw, 88px);
+}
+
+.app-shell {
+  max-width: 560px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+.app-shell-wide {
+  max-width: 1040px;
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.app-heading { max-width: 46ch; margin-bottom: 40px; }
+.app-heading h1 { font-size: clamp(1.8rem, 4vw, 2.4rem); }
+.app-heading p {
+  margin-top: 14px;
+  color: var(--color-ink-soft);
+  font-size: 1.02rem;
+}
+
+/* -------------------------------------------------------------
+   Cards / panels
+   ------------------------------------------------------------- */
+.panel {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 32px;
+}
+.panel + .panel { margin-top: 24px; }
+.panel-title { font-size: 1.05rem; margin-bottom: 4px; }
+.panel-sub { color: var(--color-ink-soft); font-size: 0.9rem; margin-bottom: 24px; }
+
+/* -------------------------------------------------------------
+   Forms (light surface, for use outside the dark .contact-form)
+   ------------------------------------------------------------- */
+.field-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.field-row:last-of-type { margin-bottom: 0; }
+.field-row label { font-size: 0.85rem; font-weight: 500; }
+.field-row .hint { font-size: 0.8rem; color: var(--color-ink-soft); font-weight: 400; }
+.field-row input,
+.field-row select,
+.field-row textarea {
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  color: var(--color-ink);
+  font-size: 0.95rem;
+}
+.field-row input:focus,
+.field-row select:focus,
+.field-row textarea:focus {
+  outline: none;
+  border-color: var(--color-ink);
+}
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+@media (min-width: 560px) {
+  .field-grid-2 { grid-template-columns: 1fr 1fr; }
+}
+
+.form-actions { display: flex; align-items: center; gap: 16px; margin-top: 24px; flex-wrap: wrap; }
+
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--color-ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.link-btn:hover { color: var(--color-ink); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-ink);
+  border: 1px solid var(--color-ink);
+}
+.btn-outline:hover { background: var(--color-ink); color: var(--color-bg); }
+
+/* -------------------------------------------------------------
+   Status / notice messages
+   ------------------------------------------------------------- */
+.notice {
+  font-size: 0.9rem;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  margin-top: 18px;
+  border: 1px solid transparent;
+}
+.notice:empty { display: none; }
+.notice-info { background: var(--color-bg); border-color: var(--color-line); color: var(--color-ink-soft); }
+.notice-success { background: #E4F2C7; border-color: #C9E2A0; color: #2C3A16; }
+.notice-error { background: #F6DEDA; border-color: #EAB9B0; color: #5C1F14; }
+
+/* -------------------------------------------------------------
+   Badges (status pills)
+   ------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.badge-pending { background: #EFE6C8; color: #5B4A12; }
+.badge-accepted, .badge-active { background: #D9F2C2; color: #2C4A0E; }
+.badge-declined, .badge-cancelled { background: #F1D6D6; color: #6B1F1F; }
+.badge-active { background: #D6FF3F; color: #17190A; }
+.badge-expired, .badge-inactive { background: var(--color-line); color: var(--color-ink-soft); }
+
+/* -------------------------------------------------------------
+   Data cards / tables (admin dashboard)
+   ------------------------------------------------------------- */
+.dash-section { margin-bottom: 64px; }
+.dash-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.dash-section-head h2 { font-size: 1.4rem; }
+.dash-section-head .count { color: var(--color-ink-soft); font-size: 0.9rem; }
+
+.record-list { display: flex; flex-direction: column; gap: 16px; }
+.record-card {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.record-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.record-title { font-family: var(--font-display); font-size: 1.1rem; }
+.record-meta { font-size: 0.85rem; color: var(--color-ink-soft); }
+.record-meta a { text-decoration: underline; text-underline-offset: 3px; }
+.record-body { font-size: 0.92rem; color: var(--color-ink-soft); max-width: 60ch; }
+.record-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.btn-tiny {
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: 1px solid var(--color-ink);
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.btn-tiny:hover { background: var(--color-ink); color: var(--color-bg); }
+.btn-tiny.is-primary { background: var(--color-ink); color: var(--color-bg); }
+.btn-tiny.is-primary:hover { background: var(--color-accent); color: var(--color-accent-ink); border-color: var(--color-accent); }
+.btn-tiny.is-danger { border-color: #8A2E20; color: #8A2E20; }
+.btn-tiny.is-danger:hover { background: #8A2E20; color: #F5F3EE; }
+.btn-tiny:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-tiny:disabled:hover { background: transparent; color: var(--color-ink); }
+
+.inline-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.inline-edit-row select,
+.inline-edit-row input {
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+}
+
+.client-group { margin-bottom: 32px; }
+.client-group-head {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.empty-state {
+  color: var(--color-ink-soft);
+  font-size: 0.92rem;
+  padding: 24px;
+  text-align: center;
+  border: 1px dashed var(--color-line);
+  border-radius: var(--radius);
+}
+
+/* -------------------------------------------------------------
+   Loading skeleton text
+   ------------------------------------------------------------- */
+.loading-text { color: var(--color-ink-soft); font-size: 0.92rem; }
+
+/* -------------------------------------------------------------
+   Portal-specific
+   ------------------------------------------------------------- */
+.gate-message {
+  background: var(--color-dark);
+  color: var(--color-dark-ink);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+  text-align: center;
+}
+.gate-message h2 { font-size: 1.4rem; margin-bottom: 12px; }
+.gate-message p { color: #C9C6BB; max-width: 46ch; margin-inline: auto; }
+
+.password-prompt { background: #EFE6C8; border-color: #DDCB8E; }
+.password-prompt .panel-title { margin-bottom: 8px; }
+
+@media (min-width: 720px) {
+  .app-shell-wide .field-grid-2 { grid-template-columns: 1fr 1fr; }
+}

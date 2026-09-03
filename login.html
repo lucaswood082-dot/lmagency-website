@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log in — LMagency</title>
+<meta name="robots" content="noindex">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/portal.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="container app-header-inner">
+    <a href="/" class="logo">LMagency</a>
+    <div class="header-right">
+      <span class="page-label">Client &amp; team login</span>
+    </div>
+  </div>
+</header>
+
+<main class="app-main">
+  <div class="app-shell">
+
+    <div id="checking-session" class="app-heading">
+      <p class="loading-text">Checking your session…</p>
+    </div>
+
+    <div id="login-area" hidden>
+      <div class="app-heading">
+        <p class="eyebrow">Welcome back</p>
+        <h1>Log in to your portal.</h1>
+        <p>Use the password you set, or email yourself a one-time login link.</p>
+      </div>
+
+      <form class="panel" id="login-form" novalidate>
+        <div class="field-row">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email">
+        </div>
+        <div class="field-row">
+          <label for="password">Password <span class="hint">(optional)</span></label>
+          <input type="password" id="password" name="password" autocomplete="current-password">
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="login-submit">Log in</button>
+          <button type="button" class="link-btn" id="magic-link-btn">Email me a login link instead</button>
+        </div>
+        <p class="notice" id="login-notice" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+  </div>
+</main>
+
+<script type="module" src="js/login.js"></script>
+</body>
+</html>
