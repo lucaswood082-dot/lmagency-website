@@ -8,10 +8,22 @@ document.addEventListener('DOMContentLoaded', () => {
      Sticky header: add a border/background once the page scrolls
      --------------------------------------------------------- */
   const header = document.getElementById('site-header');
-  const onScroll = () => {
-    header.classList.toggle('is-scrolled', window.scrollY > 8);
+  let scrolled = false;
+  let ticking = false;
+  const applyScrollState = () => {
+    const shouldBeScrolled = window.scrollY > 8;
+    if (shouldBeScrolled !== scrolled) {
+      scrolled = shouldBeScrolled;
+      header.classList.toggle('is-scrolled', scrolled);
+    }
+    ticking = false;
   };
-  onScroll();
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(applyScrollState);
+  };
+  applyScrollState();
   window.addEventListener('scroll', onScroll, { passive: true });
 
   /* ---------------------------------------------------------
