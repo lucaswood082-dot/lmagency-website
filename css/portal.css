@@ -92,7 +92,7 @@
   outline: none;
   border-color: var(--color-ink);
 }
-.checkbox-fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.checkbox-fieldset { border: 0; padding: 0; min-width: 0; }
 .checkbox-fieldset legend {
   padding: 0;
   width: 100%;
@@ -116,9 +116,16 @@
   font-weight: 500;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
-.checkbox-option:hover { border-color: var(--color-ink); }
+.checkbox-option:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  box-shadow: 0 4px 14px rgba(214, 255, 63, 0.35);
+  transform: translateY(-1px);
+}
+.checkbox-option:active { transform: translateY(0); }
 .checkbox-option input[type="checkbox"] {
   position: absolute;
   inset: 0;
