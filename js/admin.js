@@ -216,6 +216,9 @@ async function loadClientsAndSubmissions() {
     clientsList.querySelectorAll('[data-save-client]').forEach((btn) => {
       btn.addEventListener('click', () => saveClient(btn.dataset.saveClient));
     });
+    clientsList.querySelectorAll('[data-resend-invite]').forEach((btn) => {
+      btn.addEventListener('click', () => resendInvite(btn.dataset.resendInvite, btn));
+    });
   }
 
   await loadSubmissions(clients || []);
@@ -242,10 +245,52 @@ function renderClientCard(client, contactEmail) {
         <label class="hint" for="period-end-${client.id}">Renews / ends</label>
         <input type="date" id="period-end-${client.id}" value="${client.current_period_end || ''}">
         <button class="btn-tiny is-primary" data-save-client="${client.id}">Save</button>
+        <button class="btn-tiny" data-resend-invite="${client.id}">Resend invite</button>
       </div>
       <p class="notice" id="client-notice-${client.id}"></p>
     </div>
   `;
+}
+
+async function resendInvite(clientId, btn) {
+  const notice = document.getElementById(`client-notice-${clientId}`);
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Sending…';
+
+  const { data: { session } } = await supabase.auth.getSession();
+
+  try {
+    const res = await fetch('/api/resend-invite', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ client_id: clientId }),
+    });
+
+    const result = await res.json();
+    if (!res.ok) throw new Error(result.error || 'Failed to resend');
+
+    if (notice) {
+      notice.textContent = result.sent === 'invite'
+        ? 'Invite resent.'
+        : 'Sent them a fresh login link.';
+      notice.classList.remove('notice-error');
+      notice.classList.add('notice-success');
+    }
+  } catch (err) {
+    console.error(err);
+    if (notice) {
+      notice.textContent = err.message || 'Could not resend.';
+      notice.classList.remove('notice-success');
+      notice.classList.add('notice-error');
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
 }
 
 async function saveClient(clientId) {
