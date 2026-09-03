@@ -64,7 +64,7 @@ form.addEventListener('submit', async (event) => {
 
   if (error) {
     console.error(error);
-    setNotice('Could not log in with that email and password.', 'error');
+    setNotice('Could not log in with that email and password. First time signing in? Check your inbox for your invite email and use the link there instead.', 'error');
     submitBtn.disabled = false;
     return;
   }
