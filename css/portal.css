@@ -216,16 +216,41 @@
 /* -------------------------------------------------------------
    Data cards / tables (admin dashboard)
    ------------------------------------------------------------- */
-.dash-section { margin-bottom: 64px; }
+.dash-subnav {
+  position: sticky;
+  top: 76px;
+  z-index: 40;
+  display: flex;
+  gap: 28px;
+  max-width: 1040px;
+  margin-inline: auto;
+  padding: 14px 24px;
+  background: rgba(245, 243, 238, 0.95);
+  backdrop-filter: saturate(140%) blur(6px);
+  border-bottom: 1px solid var(--color-line);
+}
+.dash-subnav a {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}
+.dash-subnav a:hover { color: var(--color-ink); }
+
+.dash-section { padding-top: 48px; margin-bottom: 24px; scroll-margin-top: 130px; }
 .dash-section-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-line);
   flex-wrap: wrap;
 }
-.dash-section-head h2 { font-size: 1.4rem; }
+.dash-section-head .heading-group .eyebrow { margin-bottom: 6px; }
+.dash-section-head h2 { font-size: 1.6rem; }
 .dash-section-head .count { color: var(--color-ink-soft); font-size: 0.9rem; }
 
 .record-list { display: flex; flex-direction: column; gap: 16px; }
@@ -249,7 +274,7 @@
 .record-meta { font-size: 0.85rem; color: var(--color-ink-soft); }
 .record-meta a { text-decoration: underline; text-underline-offset: 3px; }
 .record-body { font-size: 0.92rem; color: var(--color-ink-soft); max-width: 60ch; }
-.record-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.record-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 
 .btn-tiny {
   padding: 8px 16px;
@@ -325,6 +350,32 @@
 
 .password-prompt { background: #EFE6C8; border-color: #DDCB8E; }
 .password-prompt .panel-title { margin-bottom: 8px; }
+
+/* -------------------------------------------------------------
+   Confirmation modal (replaces native confirm())
+   ------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(20, 20, 15, 0.5);
+}
+.modal-overlay[hidden] { display: none; }
+.modal-box {
+  background: var(--color-bg);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 20px 60px rgba(20, 20, 15, 0.3);
+}
+.modal-title { font-family: var(--font-display); font-size: 1.15rem; margin-bottom: 10px; }
+.modal-message { font-size: 0.92rem; color: var(--color-ink-soft); margin-bottom: 24px; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; }
 
 @media (min-width: 720px) {
   .app-shell-wide .field-grid-2 { grid-template-columns: 1fr 1fr; }

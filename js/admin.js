@@ -5,6 +5,7 @@ import { supabase, getCurrentUser, isAgencyAdmin, signOut } from './supabase-cli
 
 const loadingShell = document.getElementById('loading-shell');
 const dashboardContent = document.getElementById('dashboard-content');
+const dashboardSubnav = document.getElementById('dashboard-subnav');
 
 const applicationsList = document.getElementById('applications-list');
 const applicationsCount = document.getElementById('applications-count');
@@ -40,9 +41,45 @@ async function init() {
   }
 
   loadingShell.hidden = true;
+  dashboardSubnav.hidden = false;
   dashboardContent.hidden = false;
 
   await refreshAll();
+}
+
+// =============================================================
+// Custom confirmation modal (replaces native confirm())
+// =============================================================
+const confirmModal = document.getElementById('confirm-modal');
+const confirmModalTitle = document.getElementById('confirm-modal-title');
+const confirmModalMessage = document.getElementById('confirm-modal-message');
+const confirmModalCancel = document.getElementById('confirm-modal-cancel');
+const confirmModalConfirm = document.getElementById('confirm-modal-confirm');
+
+function confirmDialog(message, { title = 'Are you sure?', confirmLabel = 'Delete' } = {}) {
+  return new Promise((resolve) => {
+    confirmModalTitle.textContent = title;
+    confirmModalMessage.textContent = message;
+    confirmModalConfirm.textContent = confirmLabel;
+    confirmModal.hidden = false;
+
+    const cleanup = (result) => {
+      confirmModal.hidden = true;
+      confirmModalCancel.removeEventListener('click', onCancel);
+      confirmModalConfirm.removeEventListener('click', onConfirm);
+      confirmModal.removeEventListener('click', onOverlayClick);
+      resolve(result);
+    };
+    const onCancel = () => cleanup(false);
+    const onConfirm = () => cleanup(true);
+    const onOverlayClick = (event) => {
+      if (event.target === confirmModal) cleanup(false);
+    };
+
+    confirmModalCancel.addEventListener('click', onCancel);
+    confirmModalConfirm.addEventListener('click', onConfirm);
+    confirmModal.addEventListener('click', onOverlayClick);
+  });
 }
 
 // Clients load first so the "already invited" badge on applications is accurate.
@@ -144,7 +181,8 @@ function renderApplicationCard(app) {
 }
 
 async function deleteApplication(id) {
-  if (!confirm('Delete this application? This cannot be undone.')) return;
+  const ok = await confirmDialog('Delete this application? This cannot be undone.', { title: 'Delete application?' });
+  if (!ok) return;
 
   const { error } = await supabase.from('applications').delete().eq('id', id);
   if (error) {

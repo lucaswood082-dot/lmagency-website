@@ -38,11 +38,20 @@
     <p class="loading-text">Loading dashboard…</p>
   </div>
 
+  <nav class="dash-subnav" id="dashboard-subnav" hidden aria-label="Dashboard sections">
+    <a href="#applications-section">Applications</a>
+    <a href="#clients-section">Clients</a>
+    <a href="#submissions-section">Submissions</a>
+  </nav>
+
   <div class="app-shell-wide" id="dashboard-content" hidden>
 
     <section class="dash-section" id="applications-section">
       <div class="dash-section-head">
-        <h2>Applications</h2>
+        <div class="heading-group">
+          <p class="eyebrow">Review &amp; invite</p>
+          <h2>Applications</h2>
+        </div>
         <span class="count" id="applications-count"></span>
       </div>
       <div class="record-list" id="applications-list"></div>
@@ -50,7 +59,10 @@
 
     <section class="dash-section" id="clients-section">
       <div class="dash-section-head">
-        <h2>Clients</h2>
+        <div class="heading-group">
+          <p class="eyebrow">Manage access</p>
+          <h2>Clients</h2>
+        </div>
         <span class="count" id="clients-count"></span>
       </div>
       <div class="record-list" id="clients-list"></div>
@@ -58,7 +70,10 @@
 
     <section class="dash-section" id="submissions-section">
       <div class="dash-section-head">
-        <h2>Submissions</h2>
+        <div class="heading-group">
+          <p class="eyebrow">Content requests</p>
+          <h2>Submissions</h2>
+        </div>
         <span class="count" id="submissions-count"></span>
       </div>
       <div id="submissions-groups"></div>
@@ -66,6 +81,18 @@
 
   </div>
 </main>
+
+<!-- Custom confirmation modal (replaces native confirm()) -->
+<div class="modal-overlay" id="confirm-modal" hidden>
+  <div class="modal-box" role="alertdialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+    <p class="modal-title" id="confirm-modal-title">Are you sure?</p>
+    <p class="modal-message" id="confirm-modal-message"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-tiny" id="confirm-modal-cancel">Cancel</button>
+      <button type="button" class="btn-tiny is-danger" id="confirm-modal-confirm">Delete</button>
+    </div>
+  </div>
+</div>
 
 <script type="module" src="js/admin.js"></script>
 </body>

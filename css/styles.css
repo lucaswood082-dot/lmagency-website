@@ -602,7 +602,7 @@ section { padding-block: clamp(64px, 10vw, 120px); }
 .footer-inner nav { display: flex; flex-direction: column; gap: 10px; }
 .footer-inner nav a, .socials a { font-size: 0.9rem; }
 .footer-inner nav a:hover, .socials a:hover { color: var(--color-dark-ink); }
-.socials { display: flex; gap: 20px; }
+.socials { display: flex; flex-direction: column; gap: 10px; }
 .copyright { font-size: 0.8rem; padding-block: 24px; }
 
 /* =============================================================
