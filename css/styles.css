@@ -269,7 +269,15 @@ section { padding-block: clamp(64px, 10vw, 120px); }
 /* =============================================================
    MEDIA FRAME SIZING (services)
    ============================================================= */
-.media-9x16 { aspect-ratio: 9 / 16; max-width: 260px; margin-inline: auto; }
+/* Fixed height (not width) so all three formats — despite different
+   aspect ratios — line up at the same baseline within a row. */
+.media-9x16, .media-1x1, .media-4x5 {
+  height: 330px;
+  width: auto;
+  max-width: 100%;
+  margin-inline: auto;
+}
+.media-9x16 { aspect-ratio: 9 / 16; }
 .media-1x1  { aspect-ratio: 1 / 1; }
 .media-4x5  { aspect-ratio: 4 / 5; }
 
