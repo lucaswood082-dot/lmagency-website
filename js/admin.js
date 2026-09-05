@@ -14,6 +14,8 @@ const clientsCount = document.getElementById('clients-count');
 const submissionsGroups = document.getElementById('submissions-groups');
 const submissionsCount = document.getElementById('submissions-count');
 
+const CONTENT_TYPES = ['Transformation', 'Educational', 'Promo', 'Community'];
+
 document.getElementById('sign-out-btn').addEventListener('click', signOut);
 
 function escapeHtml(str) {
@@ -82,6 +84,24 @@ function confirmDialog(message, { title = 'Are you sure?', confirmLabel = 'Delet
   });
 }
 
+// =============================================================
+// Shared helper for the admin-only /api endpoints
+// =============================================================
+async function callAdminApi(path, body) {
+  const { data: { session } } = await supabase.auth.getSession();
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify(body),
+  });
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(result.error || 'Request failed');
+  return result;
+}
+
 // Clients load first so the "already invited" badge on applications is accurate.
 async function refreshAll() {
   await loadClientsAndSubmissions();
@@ -116,13 +136,10 @@ async function loadApplications() {
   applicationsList.innerHTML = data.map((app) => renderApplicationCard(app)).join('');
 
   applicationsList.querySelectorAll('[data-accept]').forEach((btn) => {
-    btn.addEventListener('click', () => updateApplicationStatus(btn.dataset.accept, 'accepted'));
+    btn.addEventListener('click', () => acceptApplication(btn.dataset.accept, btn));
   });
   applicationsList.querySelectorAll('[data-decline]').forEach((btn) => {
-    btn.addEventListener('click', () => updateApplicationStatus(btn.dataset.decline, 'declined'));
-  });
-  applicationsList.querySelectorAll('[data-invite]').forEach((btn) => {
-    btn.addEventListener('click', () => inviteClient(btn.dataset.invite, btn));
+    btn.addEventListener('click', () => declineApplication(btn.dataset.decline, btn));
   });
   applicationsList.querySelectorAll('[data-resend-invite]').forEach((btn) => {
     btn.addEventListener('click', () => resendInvite(btn.dataset.resendInvite, btn));
@@ -152,7 +169,9 @@ function renderApplicationCard(app) {
     } else if (duplicateClient) {
       statusAction = `<span class="badge badge-active">Already a client (via another application)</span>`;
     } else {
-      statusAction = `<button class="btn-tiny is-primary" data-invite="${app.id}">Invite client</button>`;
+      // Shouldn't normally happen — accepting now creates the client
+      // atomically — but leave a way to recover if it ever does.
+      statusAction = `<span class="badge badge-declined">Accepted, but no client record — contact support</span>`;
     }
   }
 
@@ -197,71 +216,70 @@ async function deleteApplication(id) {
   await loadApplications();
 }
 
-async function updateApplicationStatus(id, status) {
-  const { error } = await supabase.from('applications').update({ status }).eq('id', id);
-  if (error) {
-    console.error(error);
-    const notice = document.getElementById(`app-notice-${id}`);
-    if (notice) {
-      notice.textContent = 'Could not update status.';
-      notice.classList.add('notice-error');
-    }
-    return;
-  }
-  await loadApplications();
-}
-
-async function inviteClient(applicationId, btn) {
+async function acceptApplication(id, btn) {
   btn.disabled = true;
-  btn.textContent = 'Inviting…';
-
-  const { data: { session } } = await supabase.auth.getSession();
-  const notice = document.getElementById(`app-notice-${applicationId}`);
+  btn.textContent = 'Accepting…';
+  const notice = document.getElementById(`app-notice-${id}`);
 
   try {
-    const res = await fetch('/api/invite-client', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ application_id: applicationId }),
-    });
-
-    const result = await res.json();
-
-    if (!res.ok) {
-      throw new Error(result.error || 'Invite failed');
-    }
-
+    const result = await callAdminApi('/api/accept-application', { application_id: id });
     if (notice) {
-      notice.textContent = 'Invite sent.';
-      notice.classList.add('notice-success');
+      notice.textContent = result.emailSent
+        ? 'Accepted — invite and notification email sent.'
+        : 'Accepted and invited, but the notification email failed to send.';
+      notice.classList.add(result.emailSent ? 'notice-success' : 'notice-error');
     }
-
     await refreshAll();
   } catch (err) {
     console.error(err);
     btn.disabled = false;
-    btn.textContent = 'Invite client';
+    btn.textContent = 'Accept';
     if (notice) {
-      notice.textContent = err.message || 'Could not send invite.';
+      notice.textContent = err.message || 'Could not accept application.';
+      notice.classList.add('notice-error');
+    }
+  }
+}
+
+async function declineApplication(id, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Declining…';
+  const notice = document.getElementById(`app-notice-${id}`);
+
+  try {
+    await callAdminApi('/api/decline-application', { application_id: id });
+    if (notice) {
+      notice.textContent = 'Declined.';
+      notice.classList.add('notice-success');
+    }
+    await loadApplications();
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Decline';
+    if (notice) {
+      notice.textContent = err.message || 'Could not decline application.';
       notice.classList.add('notice-error');
     }
   }
 }
 
 // =============================================================
-// Clients + Submissions (loaded together so submissions can be
-// grouped/labeled by client business name)
+// Clients + Submissions + Content calendar (loaded together)
 // =============================================================
+let calendarByClientId = {};
+
 async function loadClientsAndSubmissions() {
-  const [{ data: clients, error: clientsError }, { data: applications }] = await Promise.all([
+  const [{ data: clients, error: clientsError }, { data: applications }, { data: calendarRows }] = await Promise.all([
     supabase
       .from('clients')
-      .select('id, business_name, instagram_handle, timezone, weekly_allocation, subscription_status, current_period_end, application_id, created_at')
+      .select('id, business_name, instagram_handle, timezone, weekly_allocation, subscription_status, current_period_end, onboarding_sent_at, application_id, created_at')
       .order('created_at', { ascending: false }),
     supabase.from('applications').select('id, contact_email'),
+    supabase
+      .from('content_calendar')
+      .select('id, client_id, content_type, scheduled_date, scheduled_time, caption, media_url, status, created_at')
+      .order('scheduled_date', { ascending: true }),
   ]);
 
   const contactEmailByApplicationId = {};
@@ -283,12 +301,20 @@ async function loadClientsAndSubmissions() {
     }
   });
 
+  calendarByClientId = {};
+  (calendarRows || []).forEach((row) => {
+    if (!calendarByClientId[row.client_id]) calendarByClientId[row.client_id] = [];
+    calendarByClientId[row.client_id].push(row);
+  });
+
   clientsCount.textContent = `${clients.length} total`;
 
   if (!clients.length) {
-    clientsList.innerHTML = '<div class="empty-state">No clients yet — invite one from the Applications list above.</div>';
+    clientsList.innerHTML = '<div class="empty-state">No clients yet — accept an application above to invite one.</div>';
   } else {
-    clientsList.innerHTML = clients.map((c) => renderClientCard(c, contactEmailByApplicationId[c.application_id])).join('');
+    clientsList.innerHTML = clients
+      .map((c) => renderClientCard(c, contactEmailByApplicationId[c.application_id], calendarByClientId[c.id] || []))
+      .join('');
 
     clientsList.querySelectorAll('[data-save-client]').forEach((btn) => {
       btn.addEventListener('click', () => saveClient(btn.dataset.saveClient));
@@ -296,18 +322,43 @@ async function loadClientsAndSubmissions() {
     clientsList.querySelectorAll('[data-resend-invite]').forEach((btn) => {
       btn.addEventListener('click', () => resendInvite(btn.dataset.resendInvite, btn));
     });
+    clientsList.querySelectorAll('[data-send-onboarding]').forEach((btn) => {
+      btn.addEventListener('click', () => sendOnboarding(btn.dataset.sendOnboarding, btn));
+    });
+    clientsList.querySelectorAll('[data-activate-client]').forEach((btn) => {
+      btn.addEventListener('click', () => activateClient(btn.dataset.activateClient, btn));
+    });
+    clientsList.querySelectorAll('[data-calendar-form]').forEach((form) => {
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        addCalendarItem(form.dataset.calendarForm, form);
+      });
+    });
+    clientsList.querySelectorAll('[data-delete-calendar-item]').forEach((btn) => {
+      btn.addEventListener('click', () => deleteCalendarItem(btn.dataset.deleteCalendarItem));
+    });
   }
 
   await loadSubmissions(clients || []);
 }
 
-function renderClientCard(client, contactEmail) {
-  const statusOptions = ['active', 'expired', 'cancelled', 'inactive'];
+function renderClientCard(client, contactEmail, calendarItems) {
+  const statusOptions = ['pending_payment', 'active', 'expired', 'cancelled'];
+  const isActive = client.subscription_status === 'active';
+
+  const onboardingAction = client.onboarding_sent_at
+    ? `<span class="hint">Onboarding sent ${formatDate(client.onboarding_sent_at)}</span>`
+    : `<button class="btn-tiny" data-send-onboarding="${client.id}">Send Onboarding</button>`;
+
+  const activateAction = !isActive
+    ? `<button class="btn-tiny is-primary" data-activate-client="${client.id}">Activate Client</button>`
+    : '';
+
   return `
     <div class="record-card">
       <div class="record-top">
         <span class="record-title">${escapeHtml(client.business_name || 'Unnamed client')}</span>
-        <span class="badge badge-${client.subscription_status}">${escapeHtml(client.subscription_status)}</span>
+        <span class="badge badge-${client.subscription_status}">${escapeHtml(client.subscription_status.replace('_', ' '))}</span>
       </div>
       <div class="record-meta">
         ${contactEmail ? `<a href="mailto:${escapeHtml(contactEmail)}">${escapeHtml(contactEmail)}</a> · ` : ''}
@@ -317,57 +368,19 @@ function renderClientCard(client, contactEmail) {
       <div class="inline-edit-row">
         <label class="hint" for="status-${client.id}">Status</label>
         <select id="status-${client.id}">
-          ${statusOptions.map((s) => `<option value="${s}" ${s === client.subscription_status ? 'selected' : ''}>${s}</option>`).join('')}
+          ${statusOptions.map((s) => `<option value="${s}" ${s === client.subscription_status ? 'selected' : ''}>${s.replace('_', ' ')}</option>`).join('')}
         </select>
         <label class="hint" for="period-end-${client.id}">Renews / ends</label>
         <input type="date" id="period-end-${client.id}" value="${client.current_period_end || ''}">
         <button class="btn-tiny is-primary" data-save-client="${client.id}">Save</button>
         <button class="btn-tiny" data-resend-invite="${client.id}">Resend invite</button>
+        ${activateAction}
+        ${onboardingAction}
       </div>
       <p class="notice" id="client-notice-${client.id}"></p>
+      ${isActive ? renderCalendarSection(client.id, calendarItems) : ''}
     </div>
   `;
-}
-
-async function resendInvite(clientId, btn) {
-  const notice = document.getElementById(`client-notice-${clientId}`);
-  btn.disabled = true;
-  const originalLabel = btn.textContent;
-  btn.textContent = 'Sending…';
-
-  const { data: { session } } = await supabase.auth.getSession();
-
-  try {
-    const res = await fetch('/api/resend-invite', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${session.access_token}`,
-      },
-      body: JSON.stringify({ client_id: clientId }),
-    });
-
-    const result = await res.json();
-    if (!res.ok) throw new Error(result.error || 'Failed to resend');
-
-    if (notice) {
-      notice.textContent = result.sent === 'invite'
-        ? 'Invite resent.'
-        : 'Sent them a fresh login link.';
-      notice.classList.remove('notice-error');
-      notice.classList.add('notice-success');
-    }
-  } catch (err) {
-    console.error(err);
-    if (notice) {
-      notice.textContent = err.message || 'Could not resend.';
-      notice.classList.remove('notice-success');
-      notice.classList.add('notice-error');
-    }
-  } finally {
-    btn.disabled = false;
-    btn.textContent = originalLabel;
-  }
 }
 
 async function saveClient(clientId) {
@@ -393,6 +406,174 @@ async function saveClient(clientId) {
   notice.textContent = 'Saved.';
   notice.classList.remove('notice-error');
   notice.classList.add('notice-success');
+  await loadClientsAndSubmissions();
+}
+
+function onePeriodFromToday() {
+  const d = new Date();
+  d.setMonth(d.getMonth() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+async function activateClient(clientId, btn) {
+  btn.disabled = true;
+  const notice = document.getElementById(`client-notice-${clientId}`);
+
+  const { error } = await supabase
+    .from('clients')
+    .update({ subscription_status: 'active', current_period_end: onePeriodFromToday() })
+    .eq('id', clientId);
+
+  btn.disabled = false;
+
+  if (error) {
+    console.error(error);
+    if (notice) {
+      notice.textContent = 'Could not activate client.';
+      notice.classList.add('notice-error');
+    }
+    return;
+  }
+
+  await loadClientsAndSubmissions();
+}
+
+async function sendOnboarding(clientId, btn) {
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  const notice = document.getElementById(`client-notice-${clientId}`);
+
+  try {
+    await callAdminApi('/api/send-onboarding', { client_id: clientId });
+    if (notice) {
+      notice.textContent = 'Onboarding email sent.';
+      notice.classList.remove('notice-error');
+      notice.classList.add('notice-success');
+    }
+    await loadClientsAndSubmissions();
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Send Onboarding';
+    if (notice) {
+      notice.textContent = err.message || 'Could not send onboarding email.';
+      notice.classList.remove('notice-success');
+      notice.classList.add('notice-error');
+    }
+  }
+}
+
+async function resendInvite(clientId, btn) {
+  const notice = document.getElementById(`client-notice-${clientId}`) || document.getElementById(`app-notice-${clientId}`);
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Sending…';
+
+  try {
+    const result = await callAdminApi('/api/resend-invite', { client_id: clientId });
+    if (notice) {
+      notice.textContent = result.sent === 'invite'
+        ? 'Invite resent.'
+        : 'Sent them a fresh login link.';
+      notice.classList.remove('notice-error');
+      notice.classList.add('notice-success');
+    }
+  } catch (err) {
+    console.error(err);
+    if (notice) {
+      notice.textContent = err.message || 'Could not resend.';
+      notice.classList.remove('notice-success');
+      notice.classList.add('notice-error');
+    }
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalLabel;
+  }
+}
+
+// =============================================================
+// Content calendar — admin add-form + list, per active client
+// =============================================================
+function renderCalendarSection(clientId, items) {
+  return `
+    <div class="calendar-section">
+      <p class="calendar-section-label">Content calendar</p>
+      <form class="calendar-add-form" data-calendar-form="${clientId}">
+        <select name="content_type" required>
+          <option value="" disabled selected>Content type…</option>
+          ${CONTENT_TYPES.map((t) => `<option value="${t}">${t}</option>`).join('')}
+        </select>
+        <div class="field-grid-2">
+          <input type="date" name="scheduled_date" placeholder="Date">
+          <input type="time" name="scheduled_time" placeholder="Time">
+        </div>
+        <textarea name="caption" rows="2" placeholder="Caption"></textarea>
+        <input type="url" name="media_url" placeholder="Media URL (optional)">
+        <div class="form-actions">
+          <button type="submit" class="btn-tiny is-primary">Add to calendar</button>
+        </div>
+        <p class="notice" id="calendar-notice-${clientId}"></p>
+      </form>
+      <div class="calendar-list">
+        ${items.length ? items.map(renderCalendarItem).join('') : '<p class="hint">Nothing scheduled yet.</p>'}
+      </div>
+    </div>
+  `;
+}
+
+function renderCalendarItem(item) {
+  const when = [item.scheduled_date, item.scheduled_time].filter(Boolean).join(' at ') || 'No date set';
+  return `
+    <div class="calendar-item">
+      <div class="calendar-item-main">
+        <span><strong>${escapeHtml(item.content_type)}</strong> — ${escapeHtml(item.caption || '(no caption)')}</span>
+        <span class="calendar-item-when">${escapeHtml(when)}${item.media_url ? ` · <a href="${escapeHtml(item.media_url)}" target="_blank" rel="noopener">media</a>` : ''}</span>
+      </div>
+      <span class="badge badge-${item.status}">${escapeHtml(item.status.replace('_', ' '))}</span>
+      <button class="btn-tiny is-danger" data-delete-calendar-item="${item.id}">Delete</button>
+    </div>
+  `;
+}
+
+async function addCalendarItem(clientId, form) {
+  const notice = document.getElementById(`calendar-notice-${clientId}`);
+  const submitBtn = form.querySelector('button[type="submit"]');
+  submitBtn.disabled = true;
+
+  const payload = {
+    client_id: clientId,
+    content_type: form.content_type.value,
+    scheduled_date: form.scheduled_date.value || null,
+    scheduled_time: form.scheduled_time.value || null,
+    caption: form.caption.value.trim() || null,
+    media_url: form.media_url.value.trim() || null,
+  };
+
+  const { error } = await supabase.from('content_calendar').insert(payload);
+  submitBtn.disabled = false;
+
+  if (error) {
+    console.error(error);
+    if (notice) {
+      notice.textContent = 'Could not add to calendar.';
+      notice.classList.add('notice-error');
+    }
+    return;
+  }
+
+  await loadClientsAndSubmissions();
+}
+
+async function deleteCalendarItem(id) {
+  const ok = await confirmDialog('Remove this calendar entry?', { title: 'Delete calendar entry?' });
+  if (!ok) return;
+
+  const { error } = await supabase.from('content_calendar').delete().eq('id', id);
+  if (error) {
+    console.error(error);
+    return;
+  }
+  await loadClientsAndSubmissions();
 }
 
 // =============================================================

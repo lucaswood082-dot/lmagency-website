@@ -7,7 +7,9 @@ const loadingShell = document.getElementById('loading-shell');
 const portalContent = document.getElementById('portal-content');
 const clientLabel = document.getElementById('client-label');
 const expiredGate = document.getElementById('expired-gate');
+const pendingPaymentGate = document.getElementById('pending-payment-gate');
 const activeArea = document.getElementById('active-area');
+const portalEyebrow = document.getElementById('portal-eyebrow');
 const portalHeading = document.getElementById('portal-heading');
 
 const passwordPanel = document.getElementById('password-panel');
@@ -19,6 +21,7 @@ const submissionForm = document.getElementById('submission-form');
 const submissionNotice = document.getElementById('submission-notice');
 const submissionSubmit = document.getElementById('submission-submit');
 const submissionsList = document.getElementById('submissions-list');
+const calendarList = document.getElementById('calendar-list');
 
 document.getElementById('sign-out-btn').addEventListener('click', signOut);
 
@@ -41,7 +44,7 @@ async function init() {
 
   const { data: client, error } = await supabase
     .from('clients')
-    .select('id, business_name, subscription_status, current_period_end')
+    .select('id, business_name, subscription_status, current_period_end, onboarding_sent_at')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -55,9 +58,6 @@ async function init() {
   }
 
   clientLabel.textContent = client.business_name || 'Client portal';
-  portalHeading.textContent = client.business_name
-    ? `Request your next post, ${client.business_name}.`
-    : 'Request your next post.';
 
   loadingShell.hidden = true;
   portalContent.hidden = false;
@@ -67,12 +67,20 @@ async function init() {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  const isActive = client.subscription_status === 'active'
-    && (!client.current_period_end || client.current_period_end >= today);
+  const isPastPeriod = client.current_period_end && client.current_period_end < today;
 
-  if (isActive) {
+  if (client.subscription_status === 'pending_payment') {
+    portalEyebrow.textContent = 'Application status';
+    portalHeading.textContent = client.business_name ? `Welcome, ${client.business_name}.` : 'Welcome.';
+    showPendingPaymentGate(client);
+  } else if (client.subscription_status === 'active' && !isPastPeriod) {
+    portalEyebrow.textContent = 'Content submission';
+    portalHeading.textContent = client.business_name
+      ? `Request your next post, ${client.business_name}.`
+      : 'Request your next post.';
     activeArea.hidden = false;
     loadSubmissions(user.id);
+    loadCalendar(user.id);
   } else {
     expiredGate.hidden = false;
   }
@@ -144,6 +152,21 @@ async function init() {
   });
 }
 
+function showPendingPaymentGate(client) {
+  pendingPaymentGate.hidden = false;
+
+  if (client.onboarding_sent_at) {
+    const onboardingStep = document.getElementById('status-step-onboarding');
+    const onboardingLabel = document.getElementById('status-step-onboarding-label');
+    const onboardingNote = document.getElementById('onboarding-note');
+
+    onboardingStep.classList.add('is-complete');
+    onboardingStep.querySelector('.step-mark').innerHTML = '&check;';
+    onboardingLabel.textContent = 'Onboarding sent';
+    onboardingNote.hidden = false;
+  }
+}
+
 async function loadSubmissions(clientId) {
   const { data, error } = await supabase
     .from('submissions')
@@ -174,6 +197,68 @@ async function loadSubmissions(clientId) {
   `).join('');
 }
 
+// =============================================================
+// Content calendar — client review (approve / request changes)
+// =============================================================
+async function loadCalendar(clientId) {
+  const { data, error } = await supabase
+    .from('content_calendar')
+    .select('id, content_type, scheduled_date, scheduled_time, caption, media_url, status')
+    .eq('client_id', clientId)
+    .order('scheduled_date', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    calendarList.innerHTML = '<p class="loading-text">Could not load your content calendar.</p>';
+    return;
+  }
+
+  if (!data.length) {
+    calendarList.innerHTML = '<div class="empty-state">Nothing scheduled yet.</div>';
+    return;
+  }
+
+  calendarList.innerHTML = data.map(renderCalendarItem).join('');
+
+  calendarList.querySelectorAll('[data-approve]').forEach((btn) => {
+    btn.addEventListener('click', () => updateCalendarStatus(btn.dataset.approve, 'approved', clientId));
+  });
+  calendarList.querySelectorAll('[data-request-changes]').forEach((btn) => {
+    btn.addEventListener('click', () => updateCalendarStatus(btn.dataset.requestChanges, 'pending_approval', clientId));
+  });
+}
+
+function renderCalendarItem(item) {
+  const when = formatWhen(item.scheduled_date, item.scheduled_time);
+  const isFinal = item.status === 'approved' || item.status === 'posted';
+
+  return `
+    <div class="record-card">
+      <div class="record-top">
+        <span class="record-title">${escapeHtml(item.content_type)}</span>
+        <span class="badge badge-${item.status}">${escapeHtml(item.status.replace('_', ' '))}</span>
+      </div>
+      <div class="record-meta">${escapeHtml(when)}${item.media_url ? ` · <a href="${escapeHtml(item.media_url)}" target="_blank" rel="noopener">View media</a>` : ''}</div>
+      ${item.caption ? `<p class="record-body">${escapeHtml(item.caption)}</p>` : ''}
+      ${!isFinal ? `
+        <div class="record-actions">
+          <button class="btn-tiny is-primary" data-approve="${item.id}">Approve</button>
+          <button class="btn-tiny" data-request-changes="${item.id}">Request changes</button>
+        </div>
+      ` : ''}
+    </div>
+  `;
+}
+
+async function updateCalendarStatus(id, status, clientId) {
+  const { error } = await supabase.from('content_calendar').update({ status }).eq('id', id);
+  if (error) {
+    console.error(error);
+    return;
+  }
+  loadCalendar(clientId);
+}
+
 function formatWhen(date, time) {
   if (!date && !time) return 'No date requested';
   return [date, time].filter(Boolean).join(' at ');
@@ -181,7 +266,7 @@ function formatWhen(date, time) {
 
 function escapeHtml(str) {
   const div = document.createElement('div');
-  div.textContent = str;
+  div.textContent = str ?? '';
   return div.innerHTML;
 }
 

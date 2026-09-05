@@ -75,6 +75,31 @@
       <p>Please get in touch so we can renew your plan and reopen the submission form.</p>
     </div>
 
+    <!-- Shown when subscription_status = 'pending_payment' -->
+    <div class="status-panel" id="pending-payment-gate" hidden>
+      <h2>You're almost in.</h2>
+      <p class="status-panel-lede">Here's where things stand with your application.</p>
+      <div class="status-steps">
+        <div class="status-step is-complete">
+          <span class="step-mark">&check;</span>
+          <span>Applied</span>
+        </div>
+        <div class="status-step is-complete">
+          <span class="step-mark">&check;</span>
+          <span>Accepted</span>
+        </div>
+        <div class="status-step" id="status-step-onboarding">
+          <span class="step-mark">3</span>
+          <span id="status-step-onboarding-label">We'll be in touch soon with next steps.</span>
+        </div>
+        <div class="status-step" id="status-step-active">
+          <span class="step-mark">4</span>
+          <span>Active</span>
+        </div>
+      </div>
+      <p class="status-note" id="onboarding-note" hidden>Check your email for payment and contract details.</p>
+    </div>
+
     <div id="active-area" hidden>
       <form class="panel" id="submission-form" novalidate>
         <div class="field-row">
@@ -111,6 +136,14 @@
         <p class="panel-title">Your recent requests</p>
         <p class="panel-sub">Newest first.</p>
         <div id="submissions-list" class="record-list">
+          <p class="loading-text">Loading…</p>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 40px;">
+        <p class="panel-title">Your content calendar</p>
+        <p class="panel-sub">What we've got scheduled for you — approve it or ask for changes.</p>
+        <div id="calendar-list" class="record-list">
           <p class="loading-text">Loading…</p>
         </div>
       </div>

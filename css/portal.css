@@ -207,11 +207,12 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
-.badge-pending { background: #EFE6C8; color: #5B4A12; }
-.badge-accepted, .badge-active { background: #D9F2C2; color: #2C4A0E; }
+.badge-pending, .badge-pending_payment, .badge-draft { background: #EFE6C8; color: #5B4A12; }
+.badge-accepted, .badge-active, .badge-approved { background: #D9F2C2; color: #2C4A0E; }
 .badge-declined, .badge-cancelled { background: #F1D6D6; color: #6B1F1F; }
 .badge-active { background: #D6FF3F; color: #17190A; }
-.badge-expired, .badge-inactive { background: var(--color-line); color: var(--color-ink-soft); }
+.badge-expired, .badge-posted { background: var(--color-line); color: var(--color-ink-soft); }
+.badge-pending_approval { background: #F3D9B1; color: #6B3F0A; }
 
 /* -------------------------------------------------------------
    Data cards / tables (admin dashboard)
@@ -331,6 +332,51 @@
 }
 
 /* -------------------------------------------------------------
+   Content calendar (admin add-form + client-facing list)
+   ------------------------------------------------------------- */
+.calendar-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-line);
+}
+.calendar-section-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+  margin-bottom: 12px;
+}
+.calendar-add-form { display: flex; flex-direction: column; gap: 10px; }
+.calendar-add-form .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.calendar-add-form select,
+.calendar-add-form input,
+.calendar-add-form textarea {
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  width: 100%;
+}
+.calendar-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+.calendar-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+}
+.calendar-item-main { display: flex; flex-direction: column; gap: 2px; }
+.calendar-item-when { color: var(--color-ink-soft); font-size: 0.8rem; }
+
+/* -------------------------------------------------------------
    Loading skeleton text
    ------------------------------------------------------------- */
 .loading-text { color: var(--color-ink-soft); font-size: 0.92rem; }
@@ -347,6 +393,46 @@
 }
 .gate-message h2 { font-size: 1.4rem; margin-bottom: 12px; }
 .gate-message p { color: #C9C6BB; max-width: 46ch; margin-inline: auto; }
+
+.status-panel {
+  background: var(--color-dark);
+  color: var(--color-dark-ink);
+  border-radius: var(--radius);
+  padding: 40px 32px;
+}
+.status-panel h2 { font-size: 1.4rem; margin-bottom: 8px; }
+.status-panel-lede { color: #C9C6BB; }
+.status-steps { display: flex; flex-direction: column; margin-top: 28px; }
+.status-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-dark-line);
+  color: #8A8778;
+  font-weight: 500;
+}
+.status-step:last-child { border-bottom: 0; }
+.status-step .step-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 1px solid var(--color-dark-line);
+  color: #8A8778;
+}
+.status-step.is-complete { color: var(--color-dark-ink); }
+.status-step.is-complete .step-mark {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+.status-note { margin-top: 20px; font-size: 0.9rem; color: #C9C6BB; }
 
 .password-prompt { background: #EFE6C8; border-color: #DDCB8E; }
 .password-prompt .panel-title { margin-bottom: 8px; }
